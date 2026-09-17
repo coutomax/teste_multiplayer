@@ -1,9 +1,9 @@
 {
   "$GMObject":"",
-  "%Name":"obj_player_render",
+  "%Name":"obj_projectile_render",
   "eventList":[],
   "managed":true,
-  "name":"obj_player_render",
+  "name":"obj_projectile_render",
   "overriddenProperties":[],
   "parent":{
     "name":"Renders",
@@ -28,8 +28,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_player",
-    "path":"sprites/spr_player/spr_player.yy",
+    "name":"spr_projectile",
+    "path":"sprites/spr_projectile/spr_projectile.yy",
   },
   "spriteMaskId":null,
   "visible":true,

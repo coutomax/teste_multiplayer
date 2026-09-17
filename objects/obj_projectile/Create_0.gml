@@ -1,5 +1,7 @@
 grav    = global.gravity;
 
+owner   = noone;
+
 data    =
 {
     move:

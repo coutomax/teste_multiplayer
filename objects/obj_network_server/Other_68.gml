@@ -5,7 +5,6 @@ if (server == _id)
 {
     if (_type == network_type_connect)
     {
-        show_message("CONECTOU");
         var _socket = async_load[? "socket"];
         var _instance = instance_create_layer(50, 50, "Instances", obj_player);
         _instance.socket = _socket;
@@ -13,7 +12,6 @@ if (server == _id)
         ds_map_add(ds_clients, _socket, _instance);
     }
     else if (_type == network_type_disconnect){
-        show_message("DESCONECTOU");
         
     	var _socket = async_load[? "socket"];
         var _instance = ds_clients[? _socket];
@@ -26,20 +24,37 @@ if (server == _id)
 }
 else {
 	var _socket = async_load[? "id"];
+    var _buffer     = async_load[? "buffer"];
+    var _message    = buffer_read(_buffer, buffer_string);
+    var _instance   = ds_clients[? _socket];
     
-    var _instance       = ds_clients[? _socket];
-    var _buffer         = async_load[? "buffer"];
-    var _read_buffer    = buffer_read(_buffer, buffer_string);
-    
-    if (_read_buffer == "Atualizar_Player")
+    switch (_message)
     {
-        var _x = buffer_read(_buffer, buffer_s16);
-        var _y = buffer_read(_buffer, buffer_s16);
+        case "player_update":
+            var _x = buffer_read(_buffer, buffer_s16);
+            var _y = buffer_read(_buffer, buffer_s16);
+            
+            _instance.x = _x;
+            _instance.y = _y;
+        break;
         
-        show_debug_message("Atualizando player para: " + string(_x) + ", " + string(_y));
-
-        _instance.x = _x;
-        _instance.y = _y;
+        case "bullet_create": 
+            var _mx = buffer_read(_buffer, buffer_s16);
+            var _my = buffer_read(_buffer, buffer_s16);
+             
+            var _attack = instance_create_layer(_instance.x, _instance.y, "Instances", obj_projectile);
+            var _dir	= point_direction(_instance.x, _instance.y, _mx, _my);
+  		
+     		_attack.data.move.xspd	= lengthdir_x(_attack.data.move.xspd, _dir);
+     		_attack.data.move.yspd	= lengthdir_y(_attack.data.move.yspd, _dir);
+          
+            _attack.direction 		= _dir;
+            _attack.image_angle     = _dir - 90;
+            
+            _attack.owner = _instance;
+        
+            ds_map_add(ds_projectiles, _socket, _attack);
+            
+        break;
     }
-    
 }

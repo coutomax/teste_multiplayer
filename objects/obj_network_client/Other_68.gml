@@ -1,35 +1,45 @@
 var _buffer = async_load[? "buffer"];
-var _read_buffer = buffer_read(_buffer, buffer_string);
+var _message = buffer_read(_buffer, buffer_string);
 
-if (_read_buffer == "Send_Client")
+switch (_message)
 {
-    var _player_count = buffer_read(_buffer, buffer_s16);
+    case "send_client":
+        var _player_count = buffer_read(_buffer, buffer_s16);
     
-    for (var i = 0; i< _player_count; i++)
-    {
+        for (var i = 0; i< _player_count; i++)
+        {
+            var _socket = buffer_read(_buffer, buffer_s16);
+            var _x = buffer_read(_buffer, buffer_s16);
+            var _y = buffer_read(_buffer, buffer_s16);
+           
+            if (!ds_map_exists(ds_players, _socket))
+            {
+               var _instance       = instance_create_layer(_x, _y, "Instances", obj_player_render);
+               ds_map_add(ds_players, _socket, _instance);
+            }
+            else 
+            {
+         	    var _instance = ds_players[? _socket];
+                _instance.x     = _x;
+                _instance.y     = _y;
+            }
+        }
+        break;
+    
+    case "disconnected":
         var _socket = buffer_read(_buffer, buffer_s16);
-        var _x = buffer_read(_buffer, buffer_s16);
-        var _y = buffer_read(_buffer, buffer_s16);
-        
-        if (!ds_map_exists(ds_players, _socket))
+    
+        if (ds_map_exists(ds_players, _socket))
         {
-            var _instance       = instance_create_layer(x, y, "Instances", obj_player_render);
-            ds_map_add(ds_players, _socket, _instance);
+            var _instance = ds_players[? _socket];
+            
+            instance_destroy(_instance);
+            ds_map_delete(ds_players, _socket);
         }
-        else 
-        {
-        	var _instance = ds_players[? _socket];
-            _instance.x     = _x;
-            _instance.y     = _y;
-        }
-    }
+        break;
 }
 
-if (_read_buffer == "disconnected")
+if (_message == "disconnected")
 {
-    var _socket = buffer_read(_buffer, buffer_s16);
-    var _instance = ds_players[? _socket];
     
-    instance_destroy(_instance);
-    ds_map_delete(ds_players, _socket);
 }

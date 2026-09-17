@@ -4,7 +4,7 @@ shoot_input = 0;
 
 grav        = global.gravity;
 
-socket      = noone;
+owner_socket      = noone;
 
 data    =
 {
@@ -23,7 +23,7 @@ data    =
     
     attack:
     {
-      attack_cd : 180,
+      attack_cd : 0,
       cd_count  : 0
     },
     
@@ -67,6 +67,8 @@ movement = function()
 
     x += data.move.xspd;
     y += data.move.yspd;
+    
+    obj_network_client.network_walk(x, y);
 }
 
 shoot = function()
@@ -74,7 +76,8 @@ shoot = function()
     shoot_input = mouse_check_button_pressed(mb_left);
     
     if (shoot_input && data.attack.cd_count == 0)
-    {
+    { 
+        /*
         var _attack = instance_create_layer(x, y, "Instances", obj_projectile);
         var _dir	= point_direction(_attack.x, _attack.y, mouse_x, mouse_y);
 		
@@ -84,6 +87,10 @@ shoot = function()
         _attack.direction 		= _dir;
         _attack.image_angle     = _dir - 90;
         
+        */
+        
+        obj_network_client.network_shoot(mouse_x, mouse_y);
+        
         data.attack.cd_count = data.attack.attack_cd;
     }
     
@@ -92,3 +99,4 @@ shoot = function()
         data.attack.cd_count--;
     }
 }
+
